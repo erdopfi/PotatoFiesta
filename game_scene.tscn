@@ -1,0 +1,104 @@
+[gd_scene load_steps=13 format=3 uid="uid://cl4kae0eaqumw"]
+
+[ext_resource type="PackedScene" uid="uid://dcgvsj02olk0s" path="res://Assets/Prefabs/player.tscn" id="1_r4kkh"]
+[ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_i6u2p"]
+[ext_resource type="Script" path="res://Scripts/GameManager.cs" id="2_o3uat"]
+[ext_resource type="Script" path="res://Scripts/Networking/NetworkUi.cs" id="3_juefd"]
+[ext_resource type="Script" path="res://Scripts/CameraController.cs" id="4_7kclc"]
+[ext_resource type="Script" path="res://Scripts/Potato.cs" id="5_dbmct"]
+[ext_resource type="Script" path="res://Scripts/Follower.cs" id="7_ayktg"]
+[ext_resource type="Script" path="res://Scripts/CatchArea.cs" id="7_tsdyf"]
+[ext_resource type="AudioStream" uid="uid://d4j8k585p1yld" path="res://Assets/Audio/Soundeffects/potato_pickup.wav" id="8_1p61h"]
+[ext_resource type="AudioStream" uid="uid://b5jm5oo87ypty" path="res://Assets/Audio/Soundeffects/potato_tick.wav" id="8_qkw8y"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_oxl86"]
+radius = 6.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6s51o"]
+atlas = ExtResource("2_i6u2p")
+region = Rect2(496, 0, 16, 16)
+
+[node name="GameScene" type="Node2D"]
+y_sort_enabled = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="NetworkUi" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("_serverButton", "_clientButton", "_ipAddressLineEdit")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -156.0
+offset_top = -116.0
+offset_right = 156.0
+offset_bottom = 116.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_juefd")
+_serverButton = NodePath("VFlowContainer/CreateServerButton")
+_clientButton = NodePath("VFlowContainer/JoinServerButton")
+_ipAddressLineEdit = NodePath("VFlowContainer/IpAddressLineEdit")
+
+[node name="VFlowContainer" type="VFlowContainer" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CreateServerButton" type="Button" parent="CanvasLayer/NetworkUi/VFlowContainer"]
+layout_mode = 2
+text = "Create server"
+
+[node name="IpAddressLineEdit" type="LineEdit" parent="CanvasLayer/NetworkUi/VFlowContainer"]
+layout_mode = 2
+placeholder_text = "Ip-address"
+
+[node name="JoinServerButton" type="Button" parent="CanvasLayer/NetworkUi/VFlowContainer"]
+layout_mode = 2
+text = "Join server"
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("_rootNode", "_potato")]
+script = ExtResource("2_o3uat")
+_playerScene = ExtResource("1_r4kkh")
+_rootNode = NodePath("..")
+_potato = NodePath("../Potato")
+
+[node name="CameraController" type="Node2D" parent="."]
+script = ExtResource("4_7kclc")
+
+[node name="Camera2D" type="Camera2D" parent="CameraController"]
+zoom = Vector2(5, 5)
+
+[node name="Potato" type="Node2D" parent="." node_paths=PackedStringArray("_tickAudioStreamPlayer")]
+script = ExtResource("5_dbmct")
+_tickAudioStreamPlayer = NodePath("TickAudioStreamPlayer")
+
+[node name="CatchArea" type="Area2D" parent="Potato"]
+collision_layer = 16
+collision_mask = 16
+script = ExtResource("7_tsdyf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Potato/CatchArea"]
+shape = SubResource("CircleShape2D_oxl86")
+debug_color = Color(0.305882, 0.611765, 0.407843, 0.419608)
+
+[node name="TickAudioStreamPlayer" type="AudioStreamPlayer2D" parent="Potato"]
+stream = ExtResource("8_qkw8y")
+max_distance = 500.0
+
+[node name="PickUpAudioStreamPlayer" type="AudioStreamPlayer2D" parent="Potato"]
+stream = ExtResource("8_1p61h")
+max_distance = 500.0
+
+[node name="PotatoVisual" type="Node2D" parent="." node_paths=PackedStringArray("Target")]
+script = ExtResource("7_ayktg")
+FollowSpeed = 7.0
+Target = NodePath("../Potato")
+
+[node name="Sprite2D" type="Sprite2D" parent="PotatoVisual"]
+position = Vector2(0, -20)
+texture = SubResource("AtlasTexture_6s51o")
