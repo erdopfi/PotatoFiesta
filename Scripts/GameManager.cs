@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using Newtonsoft.Json;
 using PotatoFiesta.Networking;
@@ -12,6 +13,7 @@ public partial class GameManager : Node
 {
     [Export] private PackedScene _playerScene;
     [Export] private Node2D _rootNode;
+    [Export] private TextureRect _winnerTextureRect;
     public static Node2D RootNode => _instance._rootNode; 
     [Export] private Potato _potato;
     public static Potato Potato => _instance._potato;
@@ -21,6 +23,8 @@ public partial class GameManager : Node
     private static Dictionary<int, Player> _players = new();
     public static List<Player> AlivePlayers { get; private set; } = new();
     public static Dictionary<int, Player> Players => _players;
+
+    public static Action<Player> OnPlayerDeath;
     
     public override void _Ready()
     {
@@ -56,7 +60,11 @@ public partial class GameManager : Node
         {
             AlivePlayers.Add(player);
         };
-        player.OnDeath += () => AlivePlayers.Remove(player);
+        player.OnDeath += () =>
+        {
+            AlivePlayers.Remove(player);
+            OnPlayerDeath?.Invoke(player);
+        };
         
         if (Network.IsServer)
         {
@@ -71,13 +79,47 @@ public partial class GameManager : Node
 
     private void CheckForWinner()
     {
-        if (AlivePlayers.Count <= 1)
+        if (AlivePlayers.Count == 1)
+        {
+            AnnounceWinner(AlivePlayers[0]);   
+        }
+        else if(AlivePlayers.Count == 0)
         {
             foreach (var player in Players.Values)
             {
                 player.Spawn();
             }
         }
+    }
+
+    private async void AnnounceWinner(Player winner)
+    {
+        GD.Print($"Player {winner.Id} won");
+        
+        _winnerTextureRect.Show();
+        _winnerTextureRect.Material = winner.Material;
+        
+        if(Network.IsServer)
+            Network.Call(this, nameof(GetWinnerFromServer), winner.Id);
+
+        await Task.Delay(5000);
+        
+        _winnerTextureRect.Hide();
+        
+        if (Network.IsServer)
+        {
+            foreach (var player in Players.Values)
+            {
+                player.Spawn();
+            }
+        }
+    }
+
+    [NetworkCallable(NetworkAuthenticationType.Server)]
+    private void GetWinnerFromServer(long winnerId)
+    {
+        var winner = Players[(int)winnerId];
+        AnnounceWinner(winner);
     }
 
     [NetworkCallable(NetworkAuthenticationType.Server)]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cl4kae0eaqumw"]
+[gd_scene load_steps=30 format=3 uid="uid://cl4kae0eaqumw"]
 
 [ext_resource type="PackedScene" uid="uid://dcgvsj02olk0s" path="res://Assets/Prefabs/player.tscn" id="1_r4kkh"]
 [ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_i6u2p"]
@@ -12,6 +12,43 @@
 [ext_resource type="AudioStream" uid="uid://d4j8k585p1yld" path="res://Assets/Audio/Soundeffects/Potato/potato_pickup.wav" id="8_wjmdb"]
 [ext_resource type="Texture2D" uid="uid://t7ta41p4hd4i" path="res://Assets/Textures/tilemap.png" id="11_scbu6"]
 [ext_resource type="PackedScene" uid="uid://cq4h77yaqahax" path="res://Assets/Prefabs/package.tscn" id="12_cop6y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a7tx2"]
+atlas = ExtResource("2_i6u2p")
+region = Rect2(416, 384, 80, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_876d1"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gbtk1"]
+atlas = SubResource("CompressedTexture2D_876d1")
+region = Rect2(416, 352, 80, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_fvtif"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s71i6"]
+atlas = SubResource("CompressedTexture2D_fvtif")
+region = Rect2(352, 416, 64, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_n5vd4"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hitnu"]
+atlas = SubResource("CompressedTexture2D_n5vd4")
+region = Rect2(352, 384, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j833x"]
+atlas = ExtResource("2_i6u2p")
+region = Rect2(416, 416, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxx0u"]
+atlas = ExtResource("2_i6u2p")
+region = Rect2(400, 448, 112, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pa7c6"]
+atlas = ExtResource("2_i6u2p")
+region = Rect2(384, 320, 128, 32)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_oxl86"]
 radius = 6.0
@@ -97,46 +134,109 @@ metadata/_edit_horizontal_guides_ = []
 
 [node name="NetworkUi" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("_serverButton", "_clientButton", "_ipAddressLineEdit")]
 layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -156.0
-offset_top = -116.0
-offset_right = 156.0
-offset_bottom = 116.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("3_juefd")
-_serverButton = NodePath("VFlowContainer/CreateServerButton")
-_clientButton = NodePath("VFlowContainer/JoinServerButton")
-_ipAddressLineEdit = NodePath("VFlowContainer/IpAddressLineEdit")
-
-[node name="VFlowContainer" type="VFlowContainer" parent="CanvasLayer/NetworkUi"]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("3_juefd")
+_serverButton = NodePath("CreateServerButton")
+_clientButton = NodePath("JoinServerButton")
+_ipAddressLineEdit = NodePath("IpAddressTexture/IpAddressLineEdit")
 
-[node name="CreateServerButton" type="Button" parent="CanvasLayer/NetworkUi/VFlowContainer"]
-layout_mode = 2
-text = "Create server"
+[node name="CreateServerButton" type="TextureButton" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -64.0
+offset_right = 180.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = SubResource("AtlasTexture_a7tx2")
+texture_hover = SubResource("AtlasTexture_gbtk1")
+stretch_mode = 0
 
-[node name="IpAddressLineEdit" type="LineEdit" parent="CanvasLayer/NetworkUi/VFlowContainer"]
-layout_mode = 2
+[node name="JoinServerButton" type="TextureButton" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -194.0
+offset_top = 171.0
+offset_right = 194.0
+offset_bottom = 309.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = SubResource("AtlasTexture_s71i6")
+texture_hover = SubResource("AtlasTexture_hitnu")
+stretch_mode = 5
+
+[node name="IpAddressTexture" type="TextureRect" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.0
+offset_top = 59.0
+offset_right = 136.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_j833x")
+
+[node name="IpAddressLineEdit" type="LineEdit" parent="CanvasLayer/NetworkUi/IpAddressTexture"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 58.0
+offset_right = -16.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
 placeholder_text = "Ip-address"
+alignment = 1
+flat = true
 
-[node name="JoinServerButton" type="Button" parent="CanvasLayer/NetworkUi/VFlowContainer"]
-layout_mode = 2
-text = "Join server"
+[node name="LogoTextureRect" type="TextureRect" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -269.5
+offset_right = 269.5
+offset_bottom = 308.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_yxx0u")
 
-[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("_rootNode", "_potato")]
+[node name="WinnerTextureRect" type="TextureRect" parent="CanvasLayer"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -355.0
+offset_top = 76.0
+offset_right = 355.0
+offset_bottom = 298.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_pa7c6")
+stretch_mode = 5
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("_rootNode", "_winnerTextureRect", "_potato")]
 script = ExtResource("2_o3uat")
 _playerScene = ExtResource("1_r4kkh")
 _rootNode = NodePath("..")
+_winnerTextureRect = NodePath("../CanvasLayer/WinnerTextureRect")
 _potato = NodePath("../Potato")
 
 [node name="CameraController" type="Node2D" parent="."]
@@ -218,7 +318,7 @@ metadata/_edit_group_ = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Border4"]
 shape = SubResource("RectangleShape2D_ob7yl")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="BackgroundSprite" type="Sprite2D" parent="."]
 z_index = -10
 scale = Vector2(4.58594, 746)
 texture = SubResource("GradientTexture1D_bup6k")

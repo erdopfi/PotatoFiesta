@@ -22,7 +22,11 @@ public partial class Potato : Node2D
     {
         base._Ready();
         Network.OnPeerConnected += SendTargetedPlayerToClient;
-        _explosionCooldown = RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime);
+        GameManager.OnPlayerDeath += player => SelectRandomPlayer(player);
+        if (Network.IsServer)
+        {
+            _explosionCooldown = RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime);
+        }
     }
     
     public override void _Process(double delta)
@@ -42,7 +46,7 @@ public partial class Potato : Node2D
                 return;
             }
 
-            if (TargetPlayer == null || TargetPlayer.IsQueuedForDeletion() || TargetPlayer.IsDead)
+            if (TargetPlayer == null)
             {
                 SetTargetPlayer(GameManager.AlivePlayers.ElementAt(RandomNumberGenerator.RandiRange(0, GameManager.AlivePlayers.Count - 1)));
             }
@@ -75,7 +79,23 @@ public partial class Potato : Node2D
     public void SetTargetPlayer(Player player)
     {
         TargetPlayer = player;
-        Network.Call(this, nameof(GetTargetedPlayerFromServer), player.GetMultiplayerAuthority());
+        Network.Call(this, nameof(GetTargetedPlayerFromServer), player.Id);
+    }
+
+    private void SelectRandomPlayer(Player player)
+    {
+        if (!Network.IsServer || player != TargetPlayer)
+            return;
+
+        if (GameManager.AlivePlayers.Count == 0)
+        {
+            TargetPlayer = null;
+            return;
+        }
+        
+        SetTargetPlayer(
+            GameManager.AlivePlayers.ElementAt(
+                RandomNumberGenerator.RandiRange(0, GameManager.AlivePlayers.Count - 1)));
     }
     
     private void SendTargetedPlayerToClient(int playerId)
@@ -90,5 +110,11 @@ public partial class Potato : Node2D
     private void GetTargetedPlayerFromServer(long playerId)
     {
         TargetPlayer = GameManager.Players[(int)playerId];
+    }
+
+    [NetworkCallable(NetworkAuthenticationType.Server)]
+    private void SendPotatoExplosionCooldownToClient(double explosionCooldown)
+    {
+        _explosionCooldown = (float)explosionCooldown;
     }
 }

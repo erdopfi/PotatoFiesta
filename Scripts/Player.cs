@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using PotatoFiesta.Misc;
 using PotatoFiesta.Networking;
 
@@ -13,6 +14,7 @@ public partial class Player : CharacterBody2D
     [Export] private AnimationPlayer _animationPlayer;
     [Export] private Sprite2D _sprite;
     [Export] private PackedScene _splatScene;
+    [Export] private CollisionShape2D _collisionShape;
     [Export] private AudioStreamPlayer2D _explosionAudioStreamPlayer;
     
     public Color Color { get; private set; }
@@ -97,6 +99,7 @@ public partial class Player : CharacterBody2D
         if (IsDead)
             return;
         
+        _collisionShape.Disabled = true;
         var splat = _splatScene.Instantiate<Splat>();
         splat.GlobalPosition = GlobalPosition.Round();
         splat.Material = Material;
@@ -114,12 +117,14 @@ public partial class Player : CharacterBody2D
     {
         if (!IsDead)
             return;
-        
+
+        _collisionShape.Disabled = false;
         _sprite.Visible = true;
         IsDead = false;
         GD.Print($"Spawned player {Id}");
         if(Network.IsServer)
             Network.Call(this, nameof(GetSpawnFromServer));
+        GlobalPosition = Vector2.Zero;
         OnSpawn?.Invoke();
     }
 
@@ -155,13 +160,14 @@ public partial class Player : CharacterBody2D
             Spawn();
         else
         {
+            _collisionShape.Disabled = true;
             _sprite.Visible = false;
         }
         
         if (Network.IsMultiplayerAuthority(this))
         {
             _eventTicker.TickEvent += SendDataToOthers;
-            CameraController.TargetNode = this;
+            CameraController.TargetPlayer = this;
         }
     }
 }

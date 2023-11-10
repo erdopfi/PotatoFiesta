@@ -81,7 +81,7 @@ stream_1/weight = 1.0
 stream_2/stream = ExtResource("7_d0avd")
 stream_2/weight = 1.0
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_animationPlayer", "_sprite", "_explosionAudioStreamPlayer")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_animationPlayer", "_sprite", "_collisionShape", "_explosionAudioStreamPlayer")]
 material = ExtResource("1_r3goq")
 collision_layer = 16
 motion_mode = 1
@@ -89,6 +89,7 @@ script = ExtResource("1_udtf7")
 _animationPlayer = NodePath("AnimationPlayer")
 _sprite = NodePath("Sprite2D")
 _splatScene = ExtResource("2_tye0n")
+_collisionShape = NodePath("CollisionShape2D")
 _explosionAudioStreamPlayer = NodePath("ExplosionAudioStreamPlayer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

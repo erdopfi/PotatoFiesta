@@ -4,8 +4,8 @@ namespace PotatoFiesta.Networking;
 
 public partial class NetworkUi : Control
 {
-    [Export] private Button _serverButton;
-    [Export] private Button _clientButton;
+    [Export] private TextureButton _serverButton;
+    [Export] private TextureButton _clientButton;
     [Export] private LineEdit _ipAddressLineEdit;
 
     public override void _Ready()
@@ -16,5 +16,8 @@ public partial class NetworkUi : Control
 
         Network.OnServerCreated += Hide;
         Network.OnClientCreated += Hide;
+
+        Network.OnServerClosed += Show;
+        Network.OnServerDisconnected += Show;
     }
 }
