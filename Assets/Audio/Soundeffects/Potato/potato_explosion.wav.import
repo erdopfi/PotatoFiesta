@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dl3rklhhaytve"
-path="res://.godot/imported/potato_explosion.wav-4826172dac55589d12adb84fb2e3a567.sample"
+path="res://.godot/imported/potato_explosion.wav-acf44dc43c0cfce561c9022ea9d671ef.sample"
 
 [deps]
 
-source_file="res://Assets/Audio/Soundeffects/potato_explosion.wav"
-dest_files=["res://.godot/imported/potato_explosion.wav-4826172dac55589d12adb84fb2e3a567.sample"]
+source_file="res://Assets/Audio/Soundeffects/Potato/potato_explosion.wav"
+dest_files=["res://.godot/imported/potato_explosion.wav-acf44dc43c0cfce561c9022ea9d671ef.sample"]
 
 [params]
 

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Newtonsoft.Json;
 using PotatoFiesta.Networking;
@@ -26,37 +28,63 @@ public partial class GameManager : Node
         _instance = this;
         
         Network.OnPeerConnected += SendPlayersToClient;
-        Network.OnPeerConnected += playerId => SpawnPlayer(playerId);
+        Network.OnPeerConnected += playerId =>
+        {
+            var randomNumberGenerator = new RandomNumberGenerator();
+            var hue = randomNumberGenerator.RandfRange(0, 1);
+            var saturation = randomNumberGenerator.RandfRange(0.5f, 1);
+            var value = randomNumberGenerator.RandfRange(0.6f, 1);
+            var color = Color.FromHsv(hue, saturation, value);
+            
+            SpawnPlayer(new PlayerData
+            {
+                Id = playerId,
+                IsDead = false,
+                ColorString = color.ToHtml()
+            });
+        };
         Network.OnPeerDisconnected += RemovePlayer;
     }
 
-    private Player SpawnPlayer(int playerId)
+    private Player SpawnPlayer(PlayerData playerData)
     {
         var player = _playerScene.Instantiate<Player>();
-        player.SetMultiplayerAuthority(playerId);
-        player.Name += playerId;
         RootNode.AddChild(player);
         
-        _players.Add(playerId, player);
+        _players.Add(playerData.Id, player);
         player.OnSpawn += () =>
         {
             AlivePlayers.Add(player);
         };
         player.OnDeath += () => AlivePlayers.Remove(player);
-
+        
         if (Network.IsServer)
         {
-            Network.Call(this, nameof(SpawnPlayerFromServer), playerId);
-            player.Spawn();
+            player.OnDeath += CheckForWinner;
+            Network.Call(this, nameof(SpawnPlayerFromServer), JsonConvert.SerializeObject(playerData));
         }
-
+        
+        player.Load(playerData);
+        
         return player;
     }
 
-    [NetworkCallable(NetworkAuthenticationType.Server)]
-    private void SpawnPlayerFromServer(long playerId)
+    private void CheckForWinner()
     {
-        SpawnPlayer((int)playerId);
+        if (AlivePlayers.Count <= 1)
+        {
+            foreach (var player in Players.Values)
+            {
+                player.Spawn();
+            }
+        }
+    }
+
+    [NetworkCallable(NetworkAuthenticationType.Server)]
+    private void SpawnPlayerFromServer(string serializedPlayerData)
+    {
+        var playerData = JsonConvert.DeserializeObject<PlayerData>(serializedPlayerData);
+        SpawnPlayer(playerData);
     }
 
     private void RemovePlayer(int peerId)
@@ -74,17 +102,7 @@ public partial class GameManager : Node
         if (peerId == 1)
             return;
 
-        var playerDataList = new List<PlayerData>();
-        foreach (var (playerId, player) in _players)
-        {
-            var playerData = new PlayerData
-            {
-                PlayerId = playerId,
-                IsDead = player.IsDead
-            };
-            playerDataList.Add(playerData);
-        }
-        
+        var playerDataList = _players.Values.Select(player => player.Save()).ToList();
         Network.CallId(peerId, this, nameof(GetPlayersFromServer), JsonConvert.SerializeObject(playerDataList));
     }
 
@@ -95,15 +113,10 @@ public partial class GameManager : Node
 
         foreach (var playerData in playerDataList)
         {
-            var player = SpawnPlayer(playerData.PlayerId);
+            var player = SpawnPlayer(playerData);
+            player.ChangeColor(Color.FromString(playerData.ColorString, Colors.White));
             if(!playerData.IsDead)
                 player.Spawn();
         }
-    }
-
-    private struct PlayerData
-    {
-        public int PlayerId { get; set; }
-        public bool IsDead { get; set; }
     }
 }

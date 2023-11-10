@@ -15,6 +15,8 @@ public partial class Player : CharacterBody2D
     [Export] private PackedScene _splatScene;
     [Export] private AudioStreamPlayer2D _explosionAudioStreamPlayer;
     
+    public Color Color { get; private set; }
+    
     private EventTicker _eventTicker;
 
     public Action OnDeath;
@@ -25,14 +27,16 @@ public partial class Player : CharacterBody2D
     public override void _Ready()
     {
         base._Ready();
-        _sprite.Visible = false;
+        
         _eventTicker = new EventTicker(0.05f);
+    }
 
-        if (Network.IsMultiplayerAuthority(this))
-        {
-            _eventTicker.TickEvent += SendDataToOthers;
-            CameraController.TargetNode = this;
-        }
+    public void ChangeColor(Color color)
+    {
+        Color = color;
+        var playerMaterial = (ShaderMaterial)Material.Duplicate();
+        playerMaterial.SetShaderParameter("player_color", color);
+        Material = playerMaterial;
     }
 
     private Vector2 _targetPosition;
@@ -94,16 +98,16 @@ public partial class Player : CharacterBody2D
             return;
         
         var splat = _splatScene.Instantiate<Splat>();
-        splat.GlobalPosition = GlobalPosition;
+        splat.GlobalPosition = GlobalPosition.Round();
+        splat.Material = Material;
         GameManager.RootNode.AddChild(splat);
         _sprite.Visible = false;
         IsDead = true;
         _explosionAudioStreamPlayer.Play();
-        OnDeath?.Invoke();
         GD.Print($"Killed player {Id}");
-        
         if(Network.IsServer)
             Network.Call(this, nameof(GetDeathFromServer));
+        OnDeath?.Invoke();
     }
 
     public void Spawn()
@@ -113,11 +117,10 @@ public partial class Player : CharacterBody2D
         
         _sprite.Visible = true;
         IsDead = false;
-        OnSpawn?.Invoke();
         GD.Print($"Spawned player {Id}");
-        
         if(Network.IsServer)
             Network.Call(this, nameof(GetSpawnFromServer));
+        OnSpawn?.Invoke();
     }
 
     [NetworkCallable(NetworkAuthenticationType.Server)]
@@ -130,5 +133,35 @@ public partial class Player : CharacterBody2D
     public void GetSpawnFromServer()
     {
         Spawn();
+    }
+
+    public PlayerData Save()
+    {
+        return new PlayerData
+        {
+            Id = Id,
+            IsDead = IsDead,
+            ColorString = Color.ToHtml()
+        };
+    }
+
+    public void Load(PlayerData playerData)
+    {
+        Name += playerData.Id;
+        SetMultiplayerAuthority(playerData.Id);
+        ChangeColor(Color.FromString(playerData.ColorString, Colors.White));
+
+        if (!playerData.IsDead)
+            Spawn();
+        else
+        {
+            _sprite.Visible = false;
+        }
+        
+        if (Network.IsMultiplayerAuthority(this))
+        {
+            _eventTicker.TickEvent += SendDataToOthers;
+            CameraController.TargetNode = this;
+        }
     }
 }

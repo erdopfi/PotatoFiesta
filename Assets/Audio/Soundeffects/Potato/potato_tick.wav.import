@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b5jm5oo87ypty"
-path="res://.godot/imported/potato_tick.wav-a274627d43fe152b2978015263cab1e1.sample"
+path="res://.godot/imported/potato_tick.wav-c903c9eb7c9ad410a7856c1d6a82d309.sample"
 
 [deps]
 
-source_file="res://Assets/Audio/Soundeffects/potato_tick.wav"
-dest_files=["res://.godot/imported/potato_tick.wav-a274627d43fe152b2978015263cab1e1.sample"]
+source_file="res://Assets/Audio/Soundeffects/Potato/potato_tick.wav"
+dest_files=["res://.godot/imported/potato_tick.wav-c903c9eb7c9ad410a7856c1d6a82d309.sample"]
 
 [params]
 

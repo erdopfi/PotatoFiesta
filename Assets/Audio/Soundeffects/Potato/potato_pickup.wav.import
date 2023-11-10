@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d4j8k585p1yld"
-path="res://.godot/imported/potato_pickup.wav-84d40281d7f32b8f4f72a1b03d1c3f79.sample"
+path="res://.godot/imported/potato_pickup.wav-14d0554d96ecce20a8113c23ada6c44c.sample"
 
 [deps]
 
-source_file="res://Assets/Audio/Soundeffects/potato_pickup.wav"
-dest_files=["res://.godot/imported/potato_pickup.wav-84d40281d7f32b8f4f72a1b03d1c3f79.sample"]
+source_file="res://Assets/Audio/Soundeffects/Potato/potato_pickup.wav"
+dest_files=["res://.godot/imported/potato_pickup.wav-14d0554d96ecce20a8113c23ada6c44c.sample"]
 
 [params]
 

@@ -13,5 +13,6 @@ z_as_relative = false
 script = ExtResource("1_kf0dj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+use_parent_material = true
 position = Vector2(1, -3)
 texture = SubResource("AtlasTexture_r8fan")

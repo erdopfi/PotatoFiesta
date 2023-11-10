@@ -1,9 +1,13 @@
-[gd_scene load_steps=11 format=3 uid="uid://dcgvsj02olk0s"]
+[gd_scene load_steps=15 format=3 uid="uid://dcgvsj02olk0s"]
 
+[ext_resource type="Material" uid="uid://cdkrj70w5mn2k" path="res://Assets/Materials/player_material.tres" id="1_r3goq"]
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_udtf7"]
 [ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_tikcp"]
 [ext_resource type="PackedScene" uid="uid://bcuk3dm5clq2" path="res://Assets/Prefabs/splat.tscn" id="2_tye0n"]
-[ext_resource type="AudioStream" uid="uid://dl3rklhhaytve" path="res://Assets/Audio/Soundeffects/potato_explosion.wav" id="4_t7ket"]
+[ext_resource type="AudioStream" uid="uid://c1eaqixnsjxg0" path="res://Assets/Audio/Soundeffects/Footsteps/footstep1.wav" id="5_u2umj"]
+[ext_resource type="AudioStream" uid="uid://dl3rklhhaytve" path="res://Assets/Audio/Soundeffects/Potato/potato_explosion.wav" id="5_v2hi7"]
+[ext_resource type="AudioStream" uid="uid://rltd1ak3hmgo" path="res://Assets/Audio/Soundeffects/Footsteps/footstep2.wav" id="6_wb722"]
+[ext_resource type="AudioStream" uid="uid://dvc4q3sfnoesg" path="res://Assets/Audio/Soundeffects/Footsteps/footstep3.wav" id="7_d0avd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oxkcc"]
 size = Vector2(6, 1)
@@ -51,7 +55,7 @@ tracks/1/path = NodePath("FootstepAudioStreamPlayer")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.4),
+"times": PackedFloat32Array(0.3, 0.7),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [0.0],
@@ -69,8 +73,16 @@ _data = {
 }
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_ayff6"]
+streams_count = 3
+stream_0/stream = ExtResource("5_u2umj")
+stream_0/weight = 1.0
+stream_1/stream = ExtResource("6_wb722")
+stream_1/weight = 1.0
+stream_2/stream = ExtResource("7_d0avd")
+stream_2/weight = 1.0
 
 [node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_animationPlayer", "_sprite", "_explosionAudioStreamPlayer")]
+material = ExtResource("1_r3goq")
 collision_layer = 16
 motion_mode = 1
 script = ExtResource("1_udtf7")
@@ -84,7 +96,8 @@ position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_oxkcc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -7)
+use_parent_material = true
+position = Vector2(0, -5)
 texture = SubResource("AtlasTexture_nlk50")
 hframes = 8
 vframes = 2
@@ -100,5 +113,5 @@ stream = SubResource("AudioStreamRandomizer_ayff6")
 max_distance = 500.0
 
 [node name="ExplosionAudioStreamPlayer" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("4_t7ket")
+stream = ExtResource("5_v2hi7")
 max_distance = 500.0

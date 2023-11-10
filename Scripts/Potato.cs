@@ -31,6 +31,8 @@ public partial class Potato : Node2D
 
         if (Network.IsServer)
         {
+            //GD.Print(GameManager.AlivePlayers.Count);
+            
             if (GameManager.AlivePlayers.Count == 0)
             {
                 foreach (var player in GameManager.AlivePlayers)

@@ -121,7 +121,7 @@ public partial class Network : Node
             {
                 methodInfo.Invoke(node, parameters);
             }
-            catch (Exception e)
+            catch (ArgumentException e)
             {
                 GD.PushWarning($"Sender sent wrong parameters for method {methodName}: {e.Message}");
             }
