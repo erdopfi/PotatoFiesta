@@ -13,6 +13,7 @@ public partial class Potato : Node2D
     
     private float _explosionCooldown = 20;
     private float _tickingCooldown;
+    private float _tickAmount;
     
     public Player TargetPlayer { get; private set; }
 
@@ -53,13 +54,17 @@ public partial class Potato : Node2D
                 GlobalPosition = TargetPlayer.GlobalPosition;
                 _explosionCooldown -= (float) delta;
                 _tickingCooldown -= (float)delta;
-                
+                _tickAmount = Mathf.Max(0, _tickAmount - (float)delta);
+
+                Material.Set("shader_parameter/tick_amount", _tickAmount);
+
                 if (_explosionCooldown < 0)
                 {
                     TargetPlayer.Die();
                     SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
                 }else if (_tickingCooldown < 0)
                 {
+                    _tickAmount = 1;
                     _tickingCooldown = _explosionCooldown / 5;
                     _tickAudioStreamPlayer.Play();
                 }

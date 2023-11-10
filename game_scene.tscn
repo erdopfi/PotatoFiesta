@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://cl4kae0eaqumw"]
+[gd_scene load_steps=31 format=3 uid="uid://cl4kae0eaqumw"]
 
 [ext_resource type="PackedScene" uid="uid://dcgvsj02olk0s" path="res://Assets/Prefabs/player.tscn" id="1_r4kkh"]
 [ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_i6u2p"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://Scripts/Networking/NetworkUi.cs" id="3_juefd"]
 [ext_resource type="Script" path="res://Scripts/CameraController.cs" id="4_7kclc"]
 [ext_resource type="Script" path="res://Scripts/Potato.cs" id="5_dbmct"]
+[ext_resource type="Material" uid="uid://dmpygwlbwkddy" path="res://Assets/Materials/potato_material.tres" id="6_afuqw"]
 [ext_resource type="Script" path="res://Scripts/Follower.cs" id="7_ayktg"]
 [ext_resource type="AudioStream" uid="uid://b5jm5oo87ypty" path="res://Assets/Audio/Soundeffects/Potato/potato_tick.wav" id="7_md835"]
 [ext_resource type="Script" path="res://Scripts/CatchArea.cs" id="7_tsdyf"]
@@ -144,6 +145,15 @@ _serverButton = NodePath("CreateServerButton")
 _clientButton = NodePath("JoinServerButton")
 _ipAddressLineEdit = NodePath("IpAddressTexture/IpAddressLineEdit")
 
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/NetworkUi"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.231373, 0.12549, 0.152941, 1)
+
 [node name="CreateServerButton" type="TextureButton" parent="CanvasLayer/NetworkUi"]
 layout_mode = 1
 anchors_preset = 8
@@ -246,6 +256,7 @@ script = ExtResource("4_7kclc")
 zoom = Vector2(5, 5)
 
 [node name="Potato" type="Node2D" parent="." node_paths=PackedStringArray("_tickAudioStreamPlayer")]
+material = ExtResource("6_afuqw")
 script = ExtResource("5_dbmct")
 _tickAudioStreamPlayer = NodePath("TickAudioStreamPlayer")
 
@@ -267,11 +278,13 @@ stream = ExtResource("8_wjmdb")
 max_distance = 500.0
 
 [node name="PotatoVisual" type="Node2D" parent="." node_paths=PackedStringArray("Target")]
+material = ExtResource("6_afuqw")
 script = ExtResource("7_ayktg")
 FollowSpeed = 7.0
 Target = NodePath("../Potato")
 
 [node name="Sprite2D" type="Sprite2D" parent="PotatoVisual"]
+use_parent_material = true
 position = Vector2(0, -20)
 texture = SubResource("AtlasTexture_6s51o")
 

@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dmpygwlbwkddy"]
+
+[ext_resource type="Shader" path="res://Assets/Shaders/potato_shader.gdshader" id="1_horxi"]
+
+[resource]
+shader = ExtResource("1_horxi")
+shader_parameter/tick_color = Color(0.941176, 0.709804, 0.254902, 1)
+shader_parameter/tick_amount = 0.0
