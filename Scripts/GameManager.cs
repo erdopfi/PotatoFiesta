@@ -36,8 +36,8 @@ public partial class GameManager : Node
         {
             var randomNumberGenerator = new RandomNumberGenerator();
             var hue = randomNumberGenerator.RandfRange(0, 1);
-            var saturation = randomNumberGenerator.RandfRange(0.5f, 1);
-            var value = randomNumberGenerator.RandfRange(0.6f, 1);
+            var saturation = randomNumberGenerator.RandfRange(0.6f, 1);
+            var value = randomNumberGenerator.RandfRange(0.75f, 1);
             var color = Color.FromHsv(hue, saturation, value);
             
             SpawnPlayer(new PlayerData

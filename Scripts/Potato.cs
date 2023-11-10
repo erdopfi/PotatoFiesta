@@ -22,10 +22,10 @@ public partial class Potato : Node2D
     {
         base._Ready();
         Network.OnPeerConnected += SendTargetedPlayerToClient;
-        GameManager.OnPlayerDeath += player => SelectRandomPlayer(player);
+        GameManager.OnPlayerDeath += SelectRandomPlayer;
         if (Network.IsServer)
         {
-            _explosionCooldown = RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime);
+            SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
         }
     }
     
@@ -35,8 +35,6 @@ public partial class Potato : Node2D
 
         if (Network.IsServer)
         {
-            //GD.Print(GameManager.AlivePlayers.Count);
-            
             if (GameManager.AlivePlayers.Count == 0)
             {
                 foreach (var player in GameManager.AlivePlayers)
@@ -59,7 +57,7 @@ public partial class Potato : Node2D
                 if (_explosionCooldown < 0)
                 {
                     TargetPlayer.Die();
-                    _explosionCooldown = RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime);
+                    SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
                 }else if (_tickingCooldown < 0)
                 {
                     _tickingCooldown = _explosionCooldown / 5;
@@ -72,6 +70,15 @@ public partial class Potato : Node2D
             if (TargetPlayer != null && !TargetPlayer.IsDead)
             {
                 GlobalPosition = TargetPlayer.GlobalPosition;
+                
+                _explosionCooldown -= (float) delta;
+                _tickingCooldown -= (float)delta;
+                
+                if (_tickingCooldown < 0)
+                {
+                    _tickingCooldown = _explosionCooldown / 5;
+                    _tickAudioStreamPlayer.Play();
+                }
             }
         }
     }
@@ -112,8 +119,16 @@ public partial class Potato : Node2D
         TargetPlayer = GameManager.Players[(int)playerId];
     }
 
+    private void SetExplosionCooldown(float explosionCooldown)
+    {
+        _explosionCooldown = explosionCooldown;
+        
+        if(Network.IsServer)
+            Network.Call(this, nameof(GetExplosionCooldownFromServer), explosionCooldown);
+    }
+
     [NetworkCallable(NetworkAuthenticationType.Server)]
-    private void SendPotatoExplosionCooldownToClient(double explosionCooldown)
+    private void GetExplosionCooldownFromServer(double explosionCooldown)
     {
         _explosionCooldown = (float)explosionCooldown;
     }
