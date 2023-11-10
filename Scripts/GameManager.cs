@@ -25,6 +25,9 @@ public partial class GameManager : Node
     public static Dictionary<int, Player> Players => _players;
 
     public static Action<Player> OnPlayerDeath;
+
+    public static Action<Player> OnRoundWon;
+    public static Action OnRoundStart;
     
     public override void _Ready()
     {
@@ -81,14 +84,11 @@ public partial class GameManager : Node
     {
         if (AlivePlayers.Count == 1)
         {
-            AnnounceWinner(AlivePlayers[0]);   
+            AnnounceWinner(AlivePlayers[0]);
         }
         else if(AlivePlayers.Count == 0)
         {
-            foreach (var player in Players.Values)
-            {
-                player.Spawn();
-            }
+            StartRound();
         }
     }
 
@@ -99,20 +99,34 @@ public partial class GameManager : Node
         _winnerTextureRect.Show();
         _winnerTextureRect.Material = winner.Material;
         
+        OnRoundWon?.Invoke(winner);
+        
         if(Network.IsServer)
             Network.Call(this, nameof(GetWinnerFromServer), winner.Id);
 
-        await Task.Delay(5000);
+        await Task.Delay(7500);
         
         _winnerTextureRect.Hide();
         
         if (Network.IsServer)
         {
+            StartRound();
+        }
+    }
+    
+    private void StartRound()
+    {
+        if (Network.IsServer)
+        {
             foreach (var player in Players.Values)
             {
+            
                 player.Spawn();
             }
+            Network.Call(this, nameof(GetRoundStartFromServer));
         }
+        
+        OnRoundStart?.Invoke();
     }
 
     [NetworkCallable(NetworkAuthenticationType.Server)]
@@ -120,6 +134,12 @@ public partial class GameManager : Node
     {
         var winner = Players[(int)winnerId];
         AnnounceWinner(winner);
+    }
+
+    [NetworkCallable(NetworkAuthenticationType.Server)]
+    private void GetRoundStartFromServer()
+    {
+        StartRound();
     }
 
     [NetworkCallable(NetworkAuthenticationType.Server)]

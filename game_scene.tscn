@@ -1,16 +1,11 @@
-[gd_scene load_steps=31 format=3 uid="uid://cl4kae0eaqumw"]
+[gd_scene load_steps=24 format=3 uid="uid://cl4kae0eaqumw"]
 
 [ext_resource type="PackedScene" uid="uid://dcgvsj02olk0s" path="res://Assets/Prefabs/player.tscn" id="1_r4kkh"]
 [ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_i6u2p"]
 [ext_resource type="Script" path="res://Scripts/GameManager.cs" id="2_o3uat"]
 [ext_resource type="Script" path="res://Scripts/Networking/NetworkUi.cs" id="3_juefd"]
 [ext_resource type="Script" path="res://Scripts/CameraController.cs" id="4_7kclc"]
-[ext_resource type="Script" path="res://Scripts/Potato.cs" id="5_dbmct"]
-[ext_resource type="Material" uid="uid://dmpygwlbwkddy" path="res://Assets/Materials/potato_material.tres" id="6_afuqw"]
-[ext_resource type="Script" path="res://Scripts/Follower.cs" id="7_ayktg"]
-[ext_resource type="AudioStream" uid="uid://b5jm5oo87ypty" path="res://Assets/Audio/Soundeffects/Potato/potato_tick.wav" id="7_md835"]
-[ext_resource type="Script" path="res://Scripts/CatchArea.cs" id="7_tsdyf"]
-[ext_resource type="AudioStream" uid="uid://d4j8k585p1yld" path="res://Assets/Audio/Soundeffects/Potato/potato_pickup.wav" id="8_wjmdb"]
+[ext_resource type="PackedScene" uid="uid://bakt31h4pox1j" path="res://Assets/Prefabs/potato.tscn" id="6_nj0cv"]
 [ext_resource type="Texture2D" uid="uid://t7ta41p4hd4i" path="res://Assets/Textures/tilemap.png" id="11_scbu6"]
 [ext_resource type="PackedScene" uid="uid://cq4h77yaqahax" path="res://Assets/Prefabs/package.tscn" id="12_cop6y"]
 
@@ -50,13 +45,6 @@ region = Rect2(400, 448, 112, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_pa7c6"]
 atlas = ExtResource("2_i6u2p")
 region = Rect2(384, 320, 128, 32)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_oxl86"]
-radius = 6.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6s51o"]
-atlas = ExtResource("2_i6u2p")
-region = Rect2(496, 0, 16, 16)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_674gq"]
 texture = ExtResource("11_scbu6")
@@ -209,9 +197,9 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = 58.0
+offset_top = 61.0
 offset_right = -16.0
-offset_bottom = -32.0
+offset_bottom = -35.0
 grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Ip-address"
@@ -227,6 +215,7 @@ offset_left = -269.5
 offset_right = 269.5
 offset_bottom = 308.0
 grow_horizontal = 2
+mouse_filter = 2
 texture = SubResource("AtlasTexture_yxx0u")
 
 [node name="WinnerTextureRect" type="TextureRect" parent="CanvasLayer"]
@@ -235,9 +224,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -355.0
-offset_top = 76.0
+offset_top = 12.0
 offset_right = 355.0
-offset_bottom = 298.0
+offset_bottom = 234.0
 grow_horizontal = 2
 texture = SubResource("AtlasTexture_pa7c6")
 stretch_mode = 5
@@ -255,38 +244,7 @@ script = ExtResource("4_7kclc")
 [node name="Camera2D" type="Camera2D" parent="CameraController"]
 zoom = Vector2(5, 5)
 
-[node name="Potato" type="Node2D" parent="." node_paths=PackedStringArray("_tickAudioStreamPlayer")]
-material = ExtResource("6_afuqw")
-script = ExtResource("5_dbmct")
-_tickAudioStreamPlayer = NodePath("TickAudioStreamPlayer")
-
-[node name="CatchArea" type="Area2D" parent="Potato"]
-collision_layer = 16
-collision_mask = 16
-script = ExtResource("7_tsdyf")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Potato/CatchArea"]
-shape = SubResource("CircleShape2D_oxl86")
-debug_color = Color(0.305882, 0.611765, 0.407843, 0.419608)
-
-[node name="TickAudioStreamPlayer" type="AudioStreamPlayer2D" parent="Potato"]
-stream = ExtResource("7_md835")
-max_distance = 500.0
-
-[node name="PickUpAudioStreamPlayer" type="AudioStreamPlayer2D" parent="Potato"]
-stream = ExtResource("8_wjmdb")
-max_distance = 500.0
-
-[node name="PotatoVisual" type="Node2D" parent="." node_paths=PackedStringArray("Target")]
-material = ExtResource("6_afuqw")
-script = ExtResource("7_ayktg")
-FollowSpeed = 7.0
-Target = NodePath("../Potato")
-
-[node name="Sprite2D" type="Sprite2D" parent="PotatoVisual"]
-use_parent_material = true
-position = Vector2(0, -20)
-texture = SubResource("AtlasTexture_6s51o")
+[node name="Potato" parent="." instance=ExtResource("6_nj0cv")]
 
 [node name="TileMap" type="TileMap" parent="."]
 z_index = -5

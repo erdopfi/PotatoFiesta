@@ -4,5 +4,5 @@
 
 [resource]
 shader = ExtResource("1_horxi")
-shader_parameter/tick_color = Color(0.941176, 0.709804, 0.254902, 1)
+shader_parameter/tick_color = Color(1, 0.933333, 0.513726, 1)
 shader_parameter/tick_amount = 0.0

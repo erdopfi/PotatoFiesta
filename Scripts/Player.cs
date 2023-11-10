@@ -1,8 +1,10 @@
 using System;
+using System.Numerics;
 using Godot;
 using Godot.Collections;
 using PotatoFiesta.Misc;
 using PotatoFiesta.Networking;
+using Vector2 = Godot.Vector2;
 
 namespace PotatoFiesta;
 
@@ -16,6 +18,7 @@ public partial class Player : CharacterBody2D
     [Export] private PackedScene _splatScene;
     [Export] private CollisionShape2D _collisionShape;
     [Export] private AudioStreamPlayer2D _explosionAudioStreamPlayer;
+    [Export] private CpuParticles2D _explosionParticles;
     
     public Color Color { get; private set; }
     
@@ -36,6 +39,7 @@ public partial class Player : CharacterBody2D
     public void ChangeColor(Color color)
     {
         Color = color;
+        _explosionParticles.Color = color;
         var playerMaterial = (ShaderMaterial)Material.Duplicate();
         playerMaterial.SetShaderParameter("player_color", color);
         Material = playerMaterial;
@@ -46,6 +50,12 @@ public partial class Player : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
+
+        if (IsDead)
+        {
+            Velocity = Vector2.Zero;
+            return;
+        }
 
         if (Network.IsMultiplayerAuthority(this))
             Velocity = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down") * 70;
@@ -107,6 +117,8 @@ public partial class Player : CharacterBody2D
         _sprite.Visible = false;
         IsDead = true;
         _explosionAudioStreamPlayer.Play();
+        _explosionParticles.Restart();
+        _explosionParticles.Emitting = true;
         GD.Print($"Killed player {Id}");
         if(Network.IsServer)
             Network.Call(this, nameof(GetDeathFromServer));

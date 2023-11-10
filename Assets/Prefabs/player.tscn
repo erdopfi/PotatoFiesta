@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dcgvsj02olk0s"]
+[gd_scene load_steps=16 format=3 uid="uid://dcgvsj02olk0s"]
 
 [ext_resource type="Material" uid="uid://cdkrj70w5mn2k" path="res://Assets/Materials/player_material.tres" id="1_r3goq"]
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_udtf7"]
@@ -81,7 +81,10 @@ stream_1/weight = 1.0
 stream_2/stream = ExtResource("7_d0avd")
 stream_2/weight = 1.0
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_animationPlayer", "_sprite", "_collisionShape", "_explosionAudioStreamPlayer")]
+[sub_resource type="Gradient" id="Gradient_74is5"]
+colors = PackedColorArray(0.87451, 0.878431, 0.909804, 1, 0.87451, 0.878431, 0.909804, 0)
+
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_animationPlayer", "_sprite", "_collisionShape", "_explosionAudioStreamPlayer", "_explosionParticles")]
 material = ExtResource("1_r3goq")
 collision_layer = 16
 motion_mode = 1
@@ -91,6 +94,7 @@ _sprite = NodePath("Sprite2D")
 _splatScene = ExtResource("2_tye0n")
 _collisionShape = NodePath("CollisionShape2D")
 _explosionAudioStreamPlayer = NodePath("ExplosionAudioStreamPlayer")
+_explosionParticles = NodePath("ExplosionParticles")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -0.5)
@@ -102,7 +106,6 @@ position = Vector2(0, -5)
 texture = SubResource("AtlasTexture_nlk50")
 hframes = 8
 vframes = 2
-frame = 8
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -116,3 +119,19 @@ max_distance = 500.0
 [node name="ExplosionAudioStreamPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("5_v2hi7")
 max_distance = 500.0
+
+[node name="ExplosionParticles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 32
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+lifetime_randomness = 0.75
+direction = Vector2(0, -1)
+gravity = Vector2(0, 120)
+initial_velocity_min = 45.0
+initial_velocity_max = 160.0
+angular_velocity_min = -720.0
+angular_velocity_max = 720.0
+scale_amount_max = 3.0
+color_ramp = SubResource("Gradient_74is5")

@@ -7,11 +7,16 @@ namespace PotatoFiesta;
 
 public partial class Potato : Node2D
 {
+    [Export] private Sprite2D _potatoSprite;
+    [Export] private Sprite2D _crownSprite;
+    
     [Export] private float _minExplosionTime = 20;
     [Export] private float _maxExplosionTime = 35;
     [Export] private AudioStreamPlayer2D _tickAudioStreamPlayer;
+    [Export] private Area2D _catchArea;
     
     private float _explosionCooldown = 20;
+    private float _catchCooldown;
     private float _tickingCooldown;
     private float _tickAmount;
     
@@ -23,69 +28,58 @@ public partial class Potato : Node2D
     {
         base._Ready();
         Network.OnPeerConnected += SendTargetedPlayerToClient;
+        Network.OnPeerConnected += SendExplosionCooldownToClient;
         GameManager.OnPlayerDeath += SelectRandomPlayer;
+        GameManager.OnRoundWon += _ => SetCrown(true);
+        GameManager.OnRoundStart += () => SetCrown(false);
+        _catchArea.BodyEntered += OnCatchAreaEntered;
+
         if (Network.IsServer)
-        {
             SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
-        }
     }
-    
+
     public override void _Process(double delta)
     {
         base._Process(delta);
 
-        if (Network.IsServer)
+        if (TargetPlayer == null)
         {
-            if (GameManager.AlivePlayers.Count == 0)
-            {
-                foreach (var player in GameManager.AlivePlayers)
-                {
-                    player.Spawn();
-                }
-                return;
-            }
+            return;
+        }
+        
+        _catchArea.GlobalPosition = TargetPlayer.GlobalPosition;
+        GlobalPosition = GlobalPosition.Lerp(TargetPlayer.GlobalPosition, (float)delta * 7);
+        if (GameManager.AlivePlayers.Count > 1)
+        {
+            _explosionCooldown -= (float) delta;
+            _tickingCooldown -= (float)delta;
+            _catchCooldown -= (float)delta;
+            _tickAmount = Mathf.Max(0, _tickAmount - (float)delta);
 
-            if (TargetPlayer == null)
-            {
-                SetTargetPlayer(GameManager.AlivePlayers.ElementAt(RandomNumberGenerator.RandiRange(0, GameManager.AlivePlayers.Count - 1)));
-            }
-            else
-            {
-                GlobalPosition = TargetPlayer.GlobalPosition;
-                _explosionCooldown -= (float) delta;
-                _tickingCooldown -= (float)delta;
-                _tickAmount = Mathf.Max(0, _tickAmount - (float)delta);
+            Material.Set("shader_parameter/tick_amount", _tickAmount);
 
-                Material.Set("shader_parameter/tick_amount", _tickAmount);
-
-                if (_explosionCooldown < 0)
-                {
-                    TargetPlayer.Die();
-                    SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
-                }else if (_tickingCooldown < 0)
-                {
-                    _tickAmount = 1;
-                    _tickingCooldown = _explosionCooldown / 5;
-                    _tickAudioStreamPlayer.Play();
-                }
+            if (Network.IsServer && _explosionCooldown < 0)
+            {
+                TargetPlayer.Die();
+                SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
+            }else if (_tickingCooldown < 0)
+            {
+                _tickAmount = 1;
+                _tickingCooldown = _explosionCooldown / 5;
+                _tickAudioStreamPlayer.Play();
             }
         }
         else
         {
-            if (TargetPlayer != null && !TargetPlayer.IsDead)
-            {
-                GlobalPosition = TargetPlayer.GlobalPosition;
-                
-                _explosionCooldown -= (float) delta;
-                _tickingCooldown -= (float)delta;
-                
-                if (_tickingCooldown < 0)
-                {
-                    _tickingCooldown = _explosionCooldown / 5;
-                    _tickAudioStreamPlayer.Play();
-                }
-            }
+            Material.Set("shader_parameter/tick_amount", 0);
         }
+        
+    }
+
+    private void SetCrown(bool settingCrown)
+    {
+        _potatoSprite.Visible = !settingCrown;
+        _crownSprite.Visible = settingCrown;
     }
 
     public void SetTargetPlayer(Player player)
@@ -110,6 +104,21 @@ public partial class Potato : Node2D
                 RandomNumberGenerator.RandiRange(0, GameManager.AlivePlayers.Count - 1)));
     }
     
+    private void OnCatchAreaEntered(Node enteredNode)
+    {
+        if (!Network.IsServer)
+            return;
+        
+        if (_catchCooldown > 0)
+            return;
+        
+        if (enteredNode is not Player player)
+            return;
+
+        GameManager.Potato.SetTargetPlayer(player);
+        _catchCooldown = 0.5f;
+    }
+    
     private void SendTargetedPlayerToClient(int playerId)
     {
         if (playerId == 1)
@@ -130,6 +139,14 @@ public partial class Potato : Node2D
         
         if(Network.IsServer)
             Network.Call(this, nameof(GetExplosionCooldownFromServer), explosionCooldown);
+    }
+
+    private void SendExplosionCooldownToClient(int playerId)
+    {
+        if (playerId == 1)
+            return;
+        
+        Network.CallId(playerId, this, nameof(GetExplosionCooldownFromServer), _explosionCooldown);
     }
 
     [NetworkCallable(NetworkAuthenticationType.Server)]

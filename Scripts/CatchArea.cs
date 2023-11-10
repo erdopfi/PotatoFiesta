@@ -5,7 +5,7 @@ namespace PotatoFiesta;
 
 public partial class CatchArea : Area2D
 {
-    private float _coolDown;
+    private float _cooldown;
     
     public override void _Ready()
     {
@@ -16,7 +16,7 @@ public partial class CatchArea : Area2D
     public override void _Process(double delta)
     {
         base._Process(delta);
-        _coolDown -= (float) delta;
+        _cooldown -= (float) delta;
     }
 
     private void OnBodyEntered(Node2D enteredNode)
@@ -24,13 +24,13 @@ public partial class CatchArea : Area2D
         if (!Network.IsServer)
             return;
 
-        if (_coolDown > 0)
+        if (_cooldown > 0)
             return;
         
         if (enteredNode is not Player player)
             return;
 
         GameManager.Potato.SetTargetPlayer(player);
-        _coolDown = 0.5f;
+        _cooldown = 0.5f;
     }
 }
