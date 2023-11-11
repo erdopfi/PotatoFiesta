@@ -4,10 +4,10 @@
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_udtf7"]
 [ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_tikcp"]
 [ext_resource type="PackedScene" uid="uid://bcuk3dm5clq2" path="res://Assets/Prefabs/splat.tscn" id="2_tye0n"]
-[ext_resource type="AudioStream" uid="uid://c1eaqixnsjxg0" path="res://Assets/Audio/Soundeffects/Footsteps/footstep1.wav" id="5_u2umj"]
-[ext_resource type="AudioStream" uid="uid://dl3rklhhaytve" path="res://Assets/Audio/Soundeffects/Potato/potato_explosion.wav" id="5_v2hi7"]
-[ext_resource type="AudioStream" uid="uid://rltd1ak3hmgo" path="res://Assets/Audio/Soundeffects/Footsteps/footstep2.wav" id="6_wb722"]
-[ext_resource type="AudioStream" uid="uid://dvc4q3sfnoesg" path="res://Assets/Audio/Soundeffects/Footsteps/footstep3.wav" id="7_d0avd"]
+[ext_resource type="AudioStream" uid="uid://b6cymkls2uq8j" path="res://Assets/Audio/Soundeffects/Footsteps/footstep1.wav" id="5_u2umj"]
+[ext_resource type="AudioStream" uid="uid://qoxqgh6wbyk8" path="res://Assets/Audio/Soundeffects/Potato/potato_explosion.wav" id="5_v2hi7"]
+[ext_resource type="AudioStream" uid="uid://bcla5lu7m1yu6" path="res://Assets/Audio/Soundeffects/Footsteps/footstep2.wav" id="6_wb722"]
+[ext_resource type="AudioStream" uid="uid://cflgjkpi52ymk" path="res://Assets/Audio/Soundeffects/Footsteps/footstep3.wav" id="7_d0avd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oxkcc"]
 size = Vector2(6, 1)
@@ -106,6 +106,7 @@ position = Vector2(0, -5)
 texture = SubResource("AtlasTexture_nlk50")
 hframes = 8
 vframes = 2
+frame = 8
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

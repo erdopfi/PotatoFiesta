@@ -54,6 +54,7 @@ public partial class Player : CharacterBody2D
         if (IsDead)
         {
             Velocity = Vector2.Zero;
+            ApplyGraphics();
             return;
         }
 

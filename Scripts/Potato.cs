@@ -13,12 +13,18 @@ public partial class Potato : Node2D
     [Export] private float _minExplosionTime = 20;
     [Export] private float _maxExplosionTime = 35;
     [Export] private AudioStreamPlayer2D _tickAudioStreamPlayer;
+    [Export] private AudioStreamPlayer _musicAudioStreamPlayer;
+    [Export] private AudioStreamPlayer2D _getPositiveAudioStreamPlayer;
+    [Export] private AudioStreamPlayer2D _getNegativeAudioStreamPlayer;
     [Export] private Area2D _catchArea;
     
     private float _explosionCooldown = 20;
     private float _catchCooldown;
     private float _tickingCooldown;
     private float _tickAmount;
+
+    private bool _isTicking;
+    private Action OnCountdownStart;
     
     public Player TargetPlayer { get; private set; }
 
@@ -35,7 +41,7 @@ public partial class Potato : Node2D
         _catchArea.BodyEntered += OnCatchAreaEntered;
 
         if (Network.IsServer)
-            SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
+            SetExplosionCooldown((float)_musicAudioStreamPlayer.Stream.GetLength());
     }
 
     public override void _Process(double delta)
@@ -51,6 +57,16 @@ public partial class Potato : Node2D
         GlobalPosition = GlobalPosition.Lerp(TargetPlayer.GlobalPosition, (float)delta * 7);
         if (GameManager.AlivePlayers.Count > 1)
         {
+            if (!_isTicking)
+            {
+                _isTicking = true;
+                _musicAudioStreamPlayer.Play((float)_musicAudioStreamPlayer.Stream.GetLength() - _explosionCooldown);
+                OnCountdownStart?.Invoke();
+            }
+
+            if (!_musicAudioStreamPlayer.Playing)
+                _musicAudioStreamPlayer.Play();
+            
             _explosionCooldown -= (float) delta;
             _tickingCooldown -= (float)delta;
             _catchCooldown -= (float)delta;
@@ -61,19 +77,20 @@ public partial class Potato : Node2D
             if (Network.IsServer && _explosionCooldown < 0)
             {
                 TargetPlayer.Die();
-                SetExplosionCooldown(RandomNumberGenerator.RandfRange(_minExplosionTime, _maxExplosionTime));
+                SetExplosionCooldown((float)_musicAudioStreamPlayer.Stream.GetLength());
             }else if (_tickingCooldown < 0)
             {
                 _tickAmount = 1;
-                _tickingCooldown = _explosionCooldown / 5;
+                _tickingCooldown = _explosionCooldown / 10;
                 _tickAudioStreamPlayer.Play();
             }
         }
         else
         {
             Material.Set("shader_parameter/tick_amount", 0);
+            _isTicking = false;
+            _musicAudioStreamPlayer.Stop();
         }
-        
     }
 
     private void SetCrown(bool settingCrown)
@@ -85,7 +102,16 @@ public partial class Potato : Node2D
     public void SetTargetPlayer(Player player)
     {
         TargetPlayer = player;
-        Network.Call(this, nameof(GetTargetedPlayerFromServer), player.Id);
+        if (player.IsMultiplayerAuthority())
+        {
+            _getNegativeAudioStreamPlayer.Play();
+        }
+        else
+        {
+            _getPositiveAudioStreamPlayer.Play();
+        }
+        if(Network.IsServer)
+            Network.Call(this, nameof(GetTargetedPlayerFromServer), player.Id);
     }
 
     private void SelectRandomPlayer(Player player)
@@ -130,7 +156,7 @@ public partial class Potato : Node2D
     [NetworkCallable(NetworkAuthenticationType.Server)]
     private void GetTargetedPlayerFromServer(long playerId)
     {
-        TargetPlayer = GameManager.Players[(int)playerId];
+        SetTargetPlayer(GameManager.Players[(int)playerId]);
     }
 
     private void SetExplosionCooldown(float explosionCooldown)

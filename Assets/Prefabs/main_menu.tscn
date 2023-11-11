@@ -1,0 +1,170 @@
+[gd_scene load_steps=15 format=3 uid="uid://dgtlb6yy25kji"]
+
+[ext_resource type="Script" path="res://Scripts/Networking/NetworkUi.cs" id="1_qbpkl"]
+[ext_resource type="Texture2D" uid="uid://bu3dfebe1x30i" path="res://Assets/Textures/spritesheet.png" id="2_f2b20"]
+[ext_resource type="AudioStream" uid="uid://bhap7bmwloa5k" path="res://Assets/Audio/Music/main_menu_music.mp3" id="3_j161e"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rfkh6"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kt6cw"]
+atlas = ExtResource("2_f2b20")
+region = Rect2(384, 352, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a7tx2"]
+atlas = ExtResource("2_f2b20")
+region = Rect2(416, 384, 80, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_876d1"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gbtk1"]
+atlas = SubResource("CompressedTexture2D_876d1")
+region = Rect2(416, 352, 80, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_fvtif"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s71i6"]
+atlas = SubResource("CompressedTexture2D_fvtif")
+region = Rect2(352, 416, 64, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_n5vd4"]
+load_path = "res://.godot/imported/spritesheet.png-1bd3f5828c5e4a75440dc80f10fa47ce.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hitnu"]
+atlas = SubResource("CompressedTexture2D_n5vd4")
+region = Rect2(352, 384, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j833x"]
+atlas = ExtResource("2_f2b20")
+region = Rect2(416, 416, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxx0u"]
+atlas = ExtResource("2_f2b20")
+region = Rect2(400, 448, 112, 64)
+
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("_serverButton", "_clientButton", "_ipAddressLineEdit", "_musicAudioStreamPlayer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qbpkl")
+_serverButton = NodePath("CreateServerButton")
+_clientButton = NodePath("JoinServerButton")
+_ipAddressLineEdit = NodePath("IpAddressTexture/IpAddressLineEdit")
+_musicAudioStreamPlayer = NodePath("MusicAudioStreamPlayer")
+
+[node name="BackgroundColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_rfkh6")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.231373, 0.12549, 0.152941, 1)
+
+[node name="ParticlesParent" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = -56.0
+offset_right = 20.0
+offset_bottom = -16.0
+grow_horizontal = 2
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="ParticlesParent"]
+position = Vector2(0, -35)
+amount = 20
+lifetime = 5.0
+texture = SubResource("AtlasTexture_kt6cw")
+emission_shape = 3
+emission_rect_extents = Vector2(500, 1)
+direction = Vector2(0, -1)
+gravity = Vector2(0, 100)
+angular_velocity_min = -181.82
+angular_velocity_max = 269.09
+scale_amount_max = 5.0
+
+[node name="CreateServerButton" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -64.0
+offset_right = 180.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = SubResource("AtlasTexture_a7tx2")
+texture_hover = SubResource("AtlasTexture_gbtk1")
+stretch_mode = 0
+
+[node name="JoinServerButton" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -194.0
+offset_top = 171.0
+offset_right = 194.0
+offset_bottom = 309.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = SubResource("AtlasTexture_s71i6")
+texture_hover = SubResource("AtlasTexture_hitnu")
+stretch_mode = 5
+
+[node name="IpAddressTexture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.0
+offset_top = 59.0
+offset_right = 136.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_j833x")
+
+[node name="IpAddressLineEdit" type="LineEdit" parent="IpAddressTexture"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 61.0
+offset_right = -16.0
+offset_bottom = -35.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Ip-address"
+alignment = 1
+flat = true
+
+[node name="LogoTextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -269.5
+offset_right = 269.5
+offset_bottom = 308.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_yxx0u")
+
+[node name="MusicAudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_j161e")
